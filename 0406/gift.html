@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>四年級健康課：過度包裝拆拆樂！</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+    body {
+      font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+      background: radial-gradient(circle at center, #f0fdf4 0%, #bbf7d0 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      padding: 10px;
+    }
+
+    /* 頂部切換與標題區 */
+    .top-bar {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 8px;
+      align-items: center;
+    }
+    .round-btn {
+      padding: 8px 18px;
+      font-size: 1.05rem;
+      font-weight: bold;
+      border: 3px solid #15803d;
+      background: white;
+      color: #15803d;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .round-btn.active {
+      background: #16a34a;
+      color: white;
+      transform: scale(1.05);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    }
+
+    /* 看結果按鈕 */
+    .show-result-btn {
+      padding: 8px 18px;
+      font-size: 1.05rem;
+      font-weight: bold;
+      border: 3px solid #b91c1c;
+      background: white;
+      color: #b91c1c;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .show-result-btn:hover {
+      background: #fee2e2;
+    }
+    .show-result-btn.active {
+      background: #dc2626 !important;
+      color: white !important;
+      transform: scale(1.05);
+      box-shadow: 0 4px 10px rgba(220, 38, 38, 0.25);
+    }
+
+    .title-banner {
+      font-size: 1.9rem;
+      color: #14532d;
+      margin-bottom: 4px;
+      text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+      text-align: center;
+    }
+
+    .status-badge {
+      background: #fef08a;
+      border: 2px dashed #ca8a04;
+      padding: 6px 20px;
+      border-radius: 25px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #854d0e;
+      margin-bottom: 12px;
+      animation: floatBadge 2s infinite ease-in-out;
+    }
+    @keyframes floatBadge {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-3px); }
+    }
+
+    /* 拆禮物主舞台容器 */
+    .stage {
+      position: relative;
+      width: 380px;
+      height: 380px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      perspective: 1000px;
+    }
+
+    /* 每一層包裝的通用樣式 */
+    .layer {
+      position: absolute;
+      inset: 0;
+      border-radius: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 14px 28px rgba(0, 0, 0, 0.2);
+      transition: transform 0.6s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.5s ease;
+      background-color: white;
+      overflow: hidden;
+    }
+    .layer:hover {
+      transform: scale(1.02);
+    }
+
+    /* 各層圖片大小 */
+    .layer-img {
+      width: 190px;
+      height: 190px;
+      object-fit: contain;
+      filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.15));
+    }
+
+    .layer-title {
+      font-size: 1.45rem;
+      font-weight: 900;
+      color: #1f2937;
+      margin-top: 8px;
+      text-shadow: 1px 1px 0px #fff;
+    }
+    .action-tip {
+      font-size: 0.95rem;
+      background: rgba(255,255,255,0.9);
+      padding: 3px 12px;
+      border-radius: 10px;
+      margin-top: 4px;
+      color: #374151;
+      font-weight: bold;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+    }
+    .layer-count-tag {
+      position: absolute;
+      top: 12px;
+      left: 14px;
+      background: #ef4444;
+      color: white;
+      font-weight: bold;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      z-index: 10;
+    }
+
+    /* 各層外框樣式 */
+    .style-box {
+      border: 7px solid #b45309;
+      background: #fef3c7;
+    }
+    .style-bag {
+      border: 7px dashed #0284c7;
+      background: #e0f2fe;
+    }
+    .style-layer2 {
+      border: 7px solid #eab308;
+      background: #fef9c3;
+    }
+    .style-layer3 {
+      border: 7px solid #f97316;
+      background: #ffedd5;
+    }
+    .style-layer4 {
+      border: 7px solid #ef4444;
+      background: #fee2e2;
+    }
+    .style-layer5 {
+      border: 7px solid #8b5cf6;
+      background: #f5f3ff;
+    }
+
+    /* 拆除時的動畫 */
+    .opened-rip {
+      transform: translateY(-110px) rotate(-18deg) scale(1.2) !important;
+      opacity: 0 !important;
+      pointer-events: none;
+    }
+    .opened-fall {
+      transform: translateY(120px) rotate(20deg) scale(1.15) !important;
+      opacity: 0 !important;
+      pointer-events: none;
+    }
+    .opened-spin {
+      transform: scale(1.35) rotate(180deg) !important;
+      opacity: 0 !important;
+      pointer-events: none;
+    }
+
+    /* 禮物核心本體（黃色邊框卡片） */
+    .gift-core {
+      position: absolute;
+      width: 220px;
+      height: 220px;
+      background: white;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 10px 24px rgba(0,0,0,0.18);
+      border: 6px solid #facc15;
+      z-index: 1;
+      padding: 12px;
+      text-align: center;
+      transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    
+    /* 點擊「看結果」時放大黃色外框，充裕容納文字 */
+    .gift-core.result-mode {
+      width: 480px;
+      height: 380px;
+      border-radius: 36px;
+      padding: 24px 20px;
+      border-width: 8px;
+      box-shadow: 0 18px 36px rgba(0,0,0,0.22);
+    }
+
+    .gift-core-icon {
+      font-size: 4.5rem;
+      animation: bounce 1.8s infinite alternate ease-in-out;
+    }
+    .gift-core.result-mode .gift-core-icon {
+      font-size: 3.5rem;
+      margin-bottom: 8px;
+    }
+
+    .gift-core-name {
+      font-size: 1.15rem;
+      font-weight: 900;
+      color: #b91c1c;
+      margin-top: 4px;
+      line-height: 1.35;
+    }
+
+    /* 36號字標題 */
+    .result-text-title {
+      font-size: 36px !important;
+      font-weight: 900;
+      color: #dc2626;
+      line-height: 1.3;
+      text-shadow: 1px 1px 2px rgba(0,0,0,0.08);
+      margin-bottom: 14px;
+      word-break: break-word;
+    }
+    
+    /* 28號字說明內文 */
+    .result-text-desc {
+      font-size: 28px !important;
+      font-weight: 900;
+      color: #1e293b;
+      line-height: 1.35;
+      word-break: break-word;
+    }
+
+    @keyframes bounce {
+      0% { transform: scale(1) translateY(0); }
+      100% { transform: scale(1.08) translateY(-6px); }
+    }
+
+    /* 下方單純置中的「再玩一次」按鈕區塊 */
+    .simple-reset-container {
+      display: none;
+      margin-top: 20px;
+      text-align: center;
+      animation: popIn 0.4s ease;
+    }
+    @keyframes popIn {
+      0% { transform: scale(0.85); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .reset-btn {
+      padding: 10px 28px;
+      font-size: 1.1rem;
+      background: #0284c7;
+      color: white;
+      font-weight: bold;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(2, 132, 199, 0.25);
+    }
+    .reset-btn:hover { background: #0369a1; }
+  </style>
+</head>
+<body>
+
+  <!-- 頂部按鈕群組 -->
+  <div class="top-bar">
+    <button class="round-btn active" id="btnR1" onclick="switchRound(1)">拆禮物（神秘箱）</button>
+    <button class="round-btn" id="btnR2" onclick="switchRound(2)">拆禮物（神秘紙袋）</button>
+    <button class="show-result-btn" id="btnResult" onclick="revealResultImmediately()">📢 看結果</button>
+  </div>
+
+  <h1 class="title-banner" id="pageTitle">🎁 拆禮物：巨大快遞箱來了！</h1>
+  <div class="status-badge" id="statusBadge">👉 請拆掉最外面的「紙箱」！</div>
+
+  <!-- 主舞台 -->
+  <div class="stage" id="stage">
+
+    <!-- 本體核心：中央位置 -->
+    <div class="gift-core" id="giftCore">
+      <div class="gift-core-icon" id="coreIcon">✏️</div>
+      <div class="gift-core-name" id="coreName">一支鉛筆</div>
+    </div>
+
+    <!-- 第 5 層：pop.jpg (防撞氣泡紙) -->
+    <div class="layer style-layer5" id="layer5" style="z-index: 5;" onclick="ripLayer(5, 'opened-spin', 'pop')">
+      <span class="layer-count-tag">第 5 層</span>
+      <img src="pop.jpg" class="layer-img" alt="防撞保護" onerror="this.src='https://cdn-icons-png.flaticon.com/512/679/679720.png'">
+      <div class="layer-title">防撞氣泡紙</div>
+      <div class="action-tip">點一下：拆開防撞氣泡紙！</div>
+    </div>
+
+    <!-- 第 4 層：image_655353.png (大紅紙盒) -->
+    <div class="layer style-layer4" id="layer4" style="z-index: 6;" onclick="ripLayer(4, 'opened-fall', 'tear')">
+      <span class="layer-count-tag">第 4 層</span>
+      <img src="image_655353.png" class="layer-img" alt="精美大禮盒" onerror="this.src='https://images.unsplash.com/photo-1549465220-1a8b9238cd48?w=300'">
+      <div class="layer-title">大禮盒</div>
+      <div class="action-tip">點一下：掀開大禮盒盒蓋！</div>
+    </div>
+
+    <!-- 第 3 層：lion.jpg -->
+    <div class="layer style-layer3" id="layer3" style="z-index: 7;" onclick="ripLayer(3, 'opened-rip', 'tear')">
+      <span class="layer-count-tag">第 3 層</span>
+      <img src="lion.jpg" class="layer-img" alt="圖案包裝紙" onerror="this.src='https://cdn-icons-png.flaticon.com/512/616/616430.png'">
+      <div class="layer-title">獅子包裝紙</div>
+      <div class="action-tip">點一下：撕開整張包裝紙！</div>
+    </div>
+
+    <!-- 第 2 層：boxyellow.jpg -->
+    <div class="layer style-layer2" id="layer2" style="z-index: 8;" onclick="ripLayer(2, 'opened-spin', 'pop')">
+      <span class="layer-count-tag">第 2 層</span>
+      <img src="boxyellow.jpg" class="layer-img" alt="黃色外盒" onerror="this.src='https://cdn-icons-png.flaticon.com/512/265/265747.png'">
+      <div class="layer-title">灰色外盒黃色緞帶</div>
+      <div class="action-tip">點一下：打開灰色外盒黃色緞帶！</div>
+    </div>
+
+    <!-- 第 1 層：box.jpg 或 bag.jpg -->
+    <div class="layer style-box" id="layer1" style="z-index: 9;" onclick="ripLayer(1, 'opened-rip', 'tear')">
+      <span class="layer-count-tag">第 1 層</span>
+      <img src="box.jpg" id="layer1Img" class="layer-img" alt="紙箱" onerror="this.src='https://cdn-icons-png.flaticon.com/512/679/679720.png'">
+      <div class="layer-title" id="layer1Title">紙箱</div>
+      <div class="action-tip" id="layer1Tip">點一下：撕開外層封口膠帶！</div>
+    </div>
+
+  </div>
+
+  <!-- 下方只顯示：再玩一次按鈕 -->
+  <div class="simple-reset-container" id="simpleResetArea">
+    <button class="reset-btn" onclick="resetCurrentRound()">再玩一次本回合</button>
+  </div>
+
+  <script>
+    let currentRound = 1;
+
+    // 音效產生器
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    function playSound(type) {
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      if (type === 'tear') {
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(80, audioCtx.currentTime + 0.22);
+        gain.gain.setValueAtTime(0.35, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.22);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.22);
+      } else if (type === 'pop') {
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(300, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(800, audioCtx.currentTime + 0.16);
+        gain.gain.setValueAtTime(0.45, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.16);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.16);
+      } else if (type === 'ta-da') {
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(260, audioCtx.currentTime);
+        osc.frequency.setValueAtTime(520, audioCtx.currentTime + 0.1);
+        osc.frequency.setValueAtTime(780, audioCtx.currentTime + 0.25);
+        gain.gain.setValueAtTime(0.35, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.45);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.45);
+      }
+    }
+
+    const roundStepHints = {
+      1: [
+        "👉 請拆掉最外面的「紙箱」！",
+        "🎉 終於看見真面目了！大家快看裡面是什麼？",
+        "👉 請打開第 5 層「防撞氣泡紙」！",
+        "👉 請掀開第 4 層「大禮盒」！",
+        "👉 請撕開第 3 層「獅子包裝紙」！",
+        "👉 請打開第 2 層「灰色外盒黃色緞帶」！"
+      ],
+      2: [
+        "👉 請拆開最外面的「紙袋」",
+        "🎉 登愣！裡面到底包了什麼神祕大寶物？！",
+        "👉 請打開第 5 層「防撞氣泡紙」！",
+        "👉 請掀開第 4 層「大禮盒」！ ",
+        "👉 請撕開第 3 層「獅子包裝紙」！",
+        "👉 請打開第 2 層「灰色外盒黃色緞帶」！"
+      ]
+    };
+
+    // 撕開單層
+    function ripLayer(layerNum, animClass, soundType) {
+      const el = document.getElementById(`layer${layerNum}`);
+      if (!el || el.classList.contains('opened-rip') || el.classList.contains('opened-fall') || el.classList.contains('opened-spin')) return;
+
+      playSound(soundType);
+      el.classList.add(animClass);
+
+      const hint = roundStepHints[currentRound][6 - layerNum];
+      document.getElementById('statusBadge').innerText = hint;
+
+      // 拆到最後一層
+      if (layerNum === 5) {
+        setTimeout(() => {
+          playSound('ta-da');
+          document.getElementById('simpleResetArea').style.display = 'block';
+        }, 450);
+      }
+    }
+
+    // 「看結果」按鈕功能：擴大黃色邊框卡片，設定標題36px、內文28px
+    function revealResultImmediately() {
+      document.getElementById('btnR1').classList.remove('active');
+      document.getElementById('btnR2').classList.remove('active');
+      document.getElementById('btnResult').classList.add('active');
+
+      const giftCore = document.getElementById('giftCore');
+      giftCore.classList.add('result-mode');
+
+      // 核心圖示
+      document.getElementById('coreIcon').innerText = "✏️🍬";
+
+      // 標題36px，內文28px
+      document.getElementById('coreName').innerHTML = `
+        <div class="result-text-title">登愣！拆了五層居然只有一塊小橡皮擦？！只有一顆小糖果？！</div>
+        <div class="result-text-desc">我們拆了「紙箱、灰色外盒黃色緞帶、獅子包裝紙、大禮盒、防撞盒」整整 5 層！</div>
+      `;
+
+      // 打開所有包裝層
+      const anims = ['opened-rip', 'opened-spin', 'opened-rip', 'opened-fall', 'opened-spin'];
+      for (let i = 1; i <= 5; i++) {
+        const el = document.getElementById(`layer${i}`);
+        if (!el.classList.contains('opened-rip') && !el.classList.contains('opened-fall') && !el.classList.contains('opened-spin')) {
+          el.classList.add(anims[i - 1]);
+        }
+      }
+
+      playSound('ta-da');
+      document.getElementById('statusBadge').innerText = "🎉 哇！這就是「過度包裝」！";
+      document.getElementById('simpleResetArea').style.display = 'block';
+    }
+
+    // 回合切換
+    function switchRound(round) {
+      currentRound = round;
+      
+      document.getElementById('btnR1').classList.toggle('active', round === 1);
+      document.getElementById('btnR2').classList.toggle('active', round === 2);
+      document.getElementById('btnResult').classList.remove('active');
+
+      const l1 = document.getElementById('layer1');
+      const imgEl = document.getElementById('layer1Img');
+
+      if (round === 1) {
+        document.getElementById('pageTitle').innerText = "🎁 第一次拆禮物：巨大快遞箱來了！";
+        l1.className = "layer style-box";
+        imgEl.src = "box.jpg";
+        imgEl.alt = "紙箱";
+
+        document.getElementById('layer1Title').innerText = "紙箱";
+        document.getElementById('layer1Tip').innerText = "點一下：撕開外層封口膠帶！";
+        
+        document.getElementById('coreIcon').innerText = "✏️";
+        document.getElementById('coreName').innerText = "一支鉛筆";
+      } else {
+        document.getElementById('pageTitle').innerText = "🛍️ 第二次拆禮物：精美禮品紙袋來了！";
+        l1.className = "layer style-bag";
+        imgEl.src = "bag.jpg";
+        imgEl.alt = "紙袋";
+
+        document.getElementById('layer1Title').innerText = "紙袋";
+        document.getElementById('layer1Tip').innerText = "點一下：拿出紙袋裡面的東西！";
+        
+        document.getElementById('coreIcon').innerText = "🍬";
+        document.getElementById('coreName').innerText = "一顆小糖果";
+      }
+
+      resetCurrentRound();
+    }
+
+    // 重設本回合
+    function resetCurrentRound() {
+      for (let i = 1; i <= 5; i++) {
+        const el = document.getElementById(`layer${i}`);
+        el.classList.remove('opened-rip', 'opened-fall', 'opened-spin');
+      }
+
+      const giftCore = document.getElementById('giftCore');
+      giftCore.classList.remove('result-mode');
+      
+      // 還原核心圖示與文字
+      if (currentRound === 1) {
+        document.getElementById('coreIcon').innerText = "✏️";
+        document.getElementById('coreName').innerText = "一支鉛筆";
+      } else {
+        document.getElementById('coreIcon').innerText = "🍬";
+        document.getElementById('coreName').innerText = "一顆小糖果";
+      }
+
+      document.getElementById('statusBadge').innerText = roundStepHints[currentRound][0];
+      document.getElementById('simpleResetArea').style.display = 'none';
+      document.getElementById('btnResult').classList.remove('active');
+    }
+  </script>
+</body>
+</html>
